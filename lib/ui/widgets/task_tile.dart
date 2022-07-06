@@ -110,16 +110,20 @@ class TaskTile extends StatelessWidget {
   _getBGCLr(int? color) {
     switch (color) {
       case 0:
-        return bluishClr;
+        return primaryClr;
 
       case 1:
         return pinkClr;
 
       case 2:
-        return orangeClr;
+        return bluesky;
+      case 3:
+        return pinky;
+      case 4:
+        return yellow;
 
       default:
-        return bluishClr;
+        return orangeClr;
     }
   }
 }

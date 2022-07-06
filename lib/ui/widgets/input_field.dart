@@ -30,7 +30,7 @@ class InputField extends StatelessWidget {
               height: 52,
               width: SizeConfig.screenWidth,
               margin: EdgeInsets.only(top: 8),
-              padding: const EdgeInsets.only(left: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(

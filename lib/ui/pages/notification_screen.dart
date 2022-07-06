@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/get_core.dart';
+import 'package:testapp/ui/pages/home_page.dart';
 import 'package:testapp/ui/theme.dart';
+
+import '../../main.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key, required this.payload}) : super(key: key);
@@ -12,6 +15,7 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   String _payload = "";
+  var name = prefs.getString('name');
   @override
   void initState() {
     // TODO: implement initState
@@ -25,15 +29,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
       backgroundColor: context.theme.backgroundColor,
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: const Icon(Icons.arrow_back_ios_outlined),
+          onPressed: () => Get.off(() => HomePage()),
+          icon: Icon(Icons.arrow_back_ios_outlined,
+              color: Get.isDarkMode ? Colors.white : darkGreyClr),
         ),
         elevation: 0,
         centerTitle: true,
         backgroundColor: context.theme.backgroundColor,
         title: Text(
           _payload.toString().split('|')[0],
-          style: TextStyle(color: Get.isDarkMode ? Colors.white : Colors.black),
+          style: TextStyle(color: Get.isDarkMode ? Colors.white : darkGreyClr),
         ),
       ),
       body: SafeArea(
@@ -45,7 +50,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             Column(
               children: [
                 Text(
-                  'Hello,Ahmad',
+                  'hello'.tr + ' $name',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w900,
@@ -56,7 +61,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   height: 10,
                 ),
                 Text(
-                  'You have a new reminder',
+                  'new'.tr,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w300,
@@ -79,7 +84,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: const [
+                      children: [
                         Icon(
                           Icons.text_format_outlined,
                           size: 35,
@@ -89,7 +94,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           width: 20,
                         ),
                         Text(
-                          'Title',
+                          'title'.tr,
                           style: TextStyle(color: Colors.white, fontSize: 30),
                         ),
                       ],
@@ -105,7 +110,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       height: 20,
                     ),
                     Row(
-                      children: const [
+                      children: [
                         Icon(
                           Icons.description,
                           size: 35,
@@ -115,7 +120,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           width: 20,
                         ),
                         Text(
-                          'Description',
+                          'desc'.tr,
                           style: TextStyle(color: Colors.white, fontSize: 30),
                         ),
                       ],
@@ -135,7 +140,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       height: 20,
                     ),
                     Row(
-                      children: const [
+                      children: [
                         Icon(
                           Icons.calendar_today_outlined,
                           size: 35,
@@ -145,7 +150,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           width: 20,
                         ),
                         Text(
-                          'Date',
+                          'date'.tr,
                           style: TextStyle(color: Colors.white, fontSize: 30),
                         ),
                       ],

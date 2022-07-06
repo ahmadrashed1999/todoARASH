@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:testapp/controllers/task_controller.dart';
+import 'package:testapp/db/db_helper.dart';
+import 'package:testapp/ui/pages/home_page.dart';
 import 'package:testapp/ui/theme.dart';
 import 'package:testapp/ui/widgets/button.dart';
 
+import '../../main.dart';
+import '../../models/task.dart';
 import '../widgets/input_field.dart';
 
 class AddTaskPage extends StatefulWidget {
@@ -28,8 +32,13 @@ class _AddTaskPageState extends State<AddTaskPage> {
   int _selectedRemind = 5;
   List<int> remindList = [5, 10, 15, 20];
   String _selectdRepeat = 'none';
-  List<String> repeatList = ['None', 'Dealy', 'Monthly'];
+  List<String> repeatList = ['None', 'Daily', 'Weakly', 'Monthly'];
   int _selectedColor = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+  }
+  var img = prefs.getString('img');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,38 +47,44 @@ class _AddTaskPageState extends State<AddTaskPage> {
       appBar: _appBar(),
       body: Container(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(
+            horizontal: 20,
+          ),
           child: SingleChildScrollView(
             child: Column(
               children: [
                 Text(
-                  'Add Task',
+                  'ah'.tr,
                   style: headingStyle,
                 ),
                 InputField(
-                  title: 'Title',
-                  hint: 'Enter something',
+                  title: 'title'.tr,
+                  hint: 'hint'.tr,
                   controller: _titleController,
                 ),
                 InputField(
-                  title: 'Note',
-                  hint: 'Enter something',
+                  title: 'note'.tr,
+                  hint: 'hint'.tr,
                   controller: _noteController,
                 ),
                 InputField(
-                  title: 'Date',
+                  title: 'date'.tr,
                   hint: DateFormat.yMd().format(_selectedDate),
                   widget: IconButton(
-                      onPressed: () {},
+                      onPressed: () => _getDateFromUser(),
                       icon: const Icon(Icons.calendar_today_outlined)),
                 ), // InputField// InputF// InputField
                 Row(children: [
                   Expanded(
                     child: InputField(
-                      title: 'Start Time',
+                      title: 'stime'.tr,
                       hint: _startTime,
                       widget: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            _getTimeFromUser(
+                              isStartTime: true,
+                            );
+                          },
                           icon: const Icon(
                             Icons.access_time_rounded,
                             color: Colors.grey,
@@ -81,10 +96,14 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   ),
                   Expanded(
                     child: InputField(
-                      title: 'End Time',
+                      title: 'etime'.tr,
                       hint: _endTime,
                       widget: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _getTimeFromUser(
+                            isStartTime: false,
+                          );
+                        },
                         icon: const Icon(Icons.access_time_rounded),
                         color: Colors.grey,
                       ),
@@ -93,8 +112,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   // Row
                 ]), // Column
                 InputField(
-                  title: 'Remind',
-                  hint: '$_selectedRemind minute early',
+                  title: 'remind'.tr,
+                  hint: '$_selectedRemind ' + 'early'.tr,
                   widget: Row(
                     children: [
                       DropdownButton(
@@ -136,7 +155,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   ),
                 ),
                 InputField(
-                  title: 'Repeat',
+                  title: 'repeat'.tr,
                   hint: _selectdRepeat,
                   widget: Row(
                     children: [
@@ -183,16 +202,19 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     _colorPalette(),
                     MyButton(
-                        lable: 'Create Task',
+                        lable: 'creat'.tr,
                         onTap: () {
-                          Get.back();
+                          _validateDate();
                         }),
                   ],
                 ),
+                SizedBox(
+                  height: 10,
+                )
               ],
             ),
           ), // SingleChildScrollView
@@ -216,8 +238,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
       backgroundColor: context.theme.backgroundColor,
       actions: [
         CircleAvatar(
-          radius: 18,
-          backgroundImage: AssetImage('images/person.jpeg'),
+          radius: 25,
+          backgroundImage: AssetImage('images/$img.png'),
         ),
         SizedBox(
           width: 20,
@@ -228,9 +250,10 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   Column _colorPalette() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Color',
+          'color'.tr,
           style: titleStyle,
         ),
         const SizedBox(
@@ -238,7 +261,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         ),
         Wrap(
             children: List.generate(
-          3,
+          6,
           (index) => GestureDetector(
             onTap: () {
               setState(() {
@@ -259,13 +282,92 @@ class _AddTaskPageState extends State<AddTaskPage> {
                     ? primaryClr
                     : index == 1
                         ? pinkClr
-                        : orangeClr,
-                radius: 16,
+                        : index == 2
+                            ? bluesky
+                            : index == 3
+                                ? pinky
+                                : index == 4
+                                    ? yellow
+                                    : orangeClr,
+                radius: 14,
               ),
             ),
           ),
         )),
       ],
     );
+  }
+
+  _validateDate() {
+    if (_titleController.text.isNotEmpty && _noteController.text.isNotEmpty) {
+      _addTasksToDb();
+      Get.offAll(() => HomePage());
+    } else if (_titleController.text.isEmpty || _noteController.text.isEmpty) {
+      Get.snackbar('requierd'.tr, 'requierd'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.white,
+          colorText: pinkClr,
+          icon: const Icon(
+            Icons.warning_amber_rounded,
+            color: Colors.red,
+          ));
+    } else {
+      print('=========================================');
+    }
+  }
+
+  _addTasksToDb() async {
+    int value = await _taskController.addTask(
+        task: Task(
+      title: _titleController.text,
+      note: _noteController.text,
+      isCompleted: 0,
+      date: DateFormat.yMd().format(_selectedDate),
+      startTime: _startTime,
+      endTime: _endTime,
+      remind: _selectedRemind,
+      repeat: _selectdRepeat,
+      color: _selectedColor,
+    ));
+    print("$value");
+  }
+
+  _getDateFromUser() async {
+    DateTime? _pickedDate = await showDatePicker(
+        context: context,
+        initialDate: _selectedDate,
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2030));
+    if (_pickedDate != null) {
+      setState(() {
+        _selectedDate = _pickedDate;
+      });
+    } else {}
+  }
+
+  void _getTimeFromUser({required bool isStartTime}) async {
+    TimeOfDay? _pickedTime = await showTimePicker(
+      context: context,
+      initialTime: isStartTime
+          ? TimeOfDay.fromDateTime(DateTime.now())
+          : TimeOfDay.fromDateTime(
+              DateTime.now().add(const Duration(minutes: 15))),
+    );
+
+    if (_pickedTime != null) {
+      String _formaTtedTime = _pickedTime.format(context);
+
+      if (isStartTime) {
+        setState(() {
+          _startTime = _formaTtedTime;
+        });
+      } else if (!isStartTime) {
+        setState(() {
+          _endTime = _formaTtedTime;
+        });
+      } else {
+        print('error');
+      }
+    } else {}
   }
 }
