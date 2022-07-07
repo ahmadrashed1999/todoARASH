@@ -105,8 +105,14 @@ class _HomePageState extends State<HomePage> {
           children: [
             _addTaskBar(),
             _addDateBar(),
-            const SizedBox(height: 8),
+            SizedBox(
+              height: 8,
+            ),
             _showTaskes(),
+            //_addTaskBar(),
+            //_addDateBar(),
+            //const SizedBox(height: 8),
+            //_showTaskes(),
           ],
         ));
   }
@@ -206,6 +212,7 @@ class _HomePageState extends State<HomePage> {
 
   _showTaskes() {
     return Expanded(
+      flex: 5,
       child: Obx(
         (() {
           if (_taskController.taskList.isEmpty) {
@@ -213,58 +220,54 @@ class _HomePageState extends State<HomePage> {
           } else {
             return RefreshIndicator(
               onRefresh: _onrefresh,
-              child: Stack(
-                children: [
-                  ListView.builder(
-                    scrollDirection:
-                        SizeConfig.orientation == Orientation.landscape
-                            ? Axis.horizontal
-                            : Axis.vertical,
-                    itemBuilder: (context, i) {
-                      var task = _taskController.taskList[i];
-                      if (task.repeat == 'Daily' ||
-                          task.date == DateFormat.yMd().format(_selectedDate) ||
-                          (task.repeat == 'Weakly' &&
-                              _selectedDate
-                                          .difference(DateFormat.yMd()
-                                              .parse(task.date!))
-                                          .inDays %
-                                      7 ==
-                                  0) ||
-                          (task.repeat == 'Monthly' &&
-                              DateFormat.yMd().parse(task.date!).day ==
-                                  _selectedDate.day)) {
-                        var date = DateFormat.jm().parse(task.startTime!);
-                        var myTime = DateFormat('HH:mm').format(date);
-                        notifyHelper.scheduledNotification(
-                            int.parse(myTime.toString().split(':')[0]),
-                            int.parse(myTime.toString().split(':')[1]),
-                            task);
-                        return AnimationConfiguration.staggeredList(
-                          position: i,
-                          duration: Duration(milliseconds: 500),
-                          child: SlideAnimation(
-                            horizontalOffset: 300,
-                            child: FadeInAnimation(
-                              child: GestureDetector(
-                                onTap: () {
-                                  _showBottmSheet(
-                                    context,
-                                    task,
-                                  );
-                                },
-                                child: TaskTile(task),
-                              ),
-                            ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                scrollDirection: SizeConfig.orientation == Orientation.landscape
+                    ? Axis.horizontal
+                    : Axis.vertical,
+                itemBuilder: (context, i) {
+                  var task = _taskController.taskList[i];
+                  if (task.repeat == 'Daily' ||
+                      task.date == DateFormat.yMd().format(_selectedDate) ||
+                      (task.repeat == 'Weakly' &&
+                          _selectedDate
+                                      .difference(
+                                          DateFormat.yMd().parse(task.date!))
+                                      .inDays %
+                                  7 ==
+                              0) ||
+                      (task.repeat == 'Monthly' &&
+                          DateFormat.yMd().parse(task.date!).day ==
+                              _selectedDate.day)) {
+                    var date = DateFormat.jm().parse(task.startTime!);
+                    var myTime = DateFormat('HH:mm').format(date);
+                    notifyHelper.scheduledNotification(
+                        int.parse(myTime.toString().split(':')[0]),
+                        int.parse(myTime.toString().split(':')[1]),
+                        task);
+                    return AnimationConfiguration.staggeredList(
+                      position: i,
+                      duration: Duration(milliseconds: 500),
+                      child: SlideAnimation(
+                        horizontalOffset: 300,
+                        child: FadeInAnimation(
+                          child: GestureDetector(
+                            onTap: () {
+                              _showBottmSheet(
+                                context,
+                                task,
+                              );
+                            },
+                            child: TaskTile(task),
                           ),
-                        );
-                      } else {
-                        return Container();
-                      }
-                    },
-                    itemCount: _taskController.taskList.length,
-                  ),
-                ],
+                        ),
+                      ),
+                    );
+                  } else {
+                    return Container();
+                  }
+                },
+                itemCount: _taskController.taskList.length,
               ),
             );
           }
