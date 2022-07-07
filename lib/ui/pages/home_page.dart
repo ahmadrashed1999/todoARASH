@@ -212,7 +212,7 @@ class _HomePageState extends State<HomePage> {
 
   _showTaskes() {
     return Expanded(
-      flex: 5,
+     
       child: Obx(
         (() {
           if (_taskController.taskList.isEmpty) {
