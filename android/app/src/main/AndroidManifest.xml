@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.testapp">
+    package="com.example.todoARSH">
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="Todo ARSH"
         android:name="${applicationName}"
